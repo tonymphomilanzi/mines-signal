@@ -21,7 +21,7 @@ export default function LoginPage() {
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    console.log("LOGIN FORM SUBMITTED to:", `${API_URL}/api/auth/login`);
+    console.log("LOGIN FORM SUBMITTED to:", `${API_URL}/backend/app/api/auth/login`);
 
     if (loading) {
       return;
