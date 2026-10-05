@@ -32,7 +32,7 @@ export default function LoginPage() {
 
     try {
       const response = await fetch(
-        `${API_URL}/api/auth/login`,
+        `${API_URL}/backend/app/api/auth/login`,
         {
           method: "POST",
           headers: {
