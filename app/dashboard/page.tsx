@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import AdminShell from "@/components/layout/AdminShell";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://127.0.0.1:8000";
+
+import { config } from "@/lib/config";
+
+const API_URL = config.apiUrl;
 
 interface Signal {
   id: string;
