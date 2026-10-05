@@ -79,17 +79,22 @@ app = FastAPI(
 # ============================================================
 # CORS
 # ============================================================
+# Allow your Vercel frontend and local development
+origins = [
+    "https://mines-signal-eight.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,      # Allows requests from your Vercel domain
+    allow_credentials=True,     # Allows cookies / auth headers
+    allow_methods=["*"],        # Allows all HTTP methods (GET, POST, OPTIONS, etc.)
+    allow_headers=["*"],        # Allows all headers
 )
+
 
 
 # ============================================================
