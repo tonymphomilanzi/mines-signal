@@ -29,7 +29,6 @@ router = APIRouter(
 # ============================================================
 
 AUTH_COOKIE_NAME = "mines_admin_token"
-
 AUTH_COOKIE_MAX_AGE = 60 * 60  # 1 hour
 
 
@@ -77,6 +76,8 @@ def login(
 
     # --------------------------------------------------------
     # Store JWT in HTTP-only cookie
+    # NOTE: secure=True and samesite="none" are REQUIRED 
+    # for cookies to work across domains (Vercel -> Railway)
     # --------------------------------------------------------
 
     response.set_cookie(
@@ -84,8 +85,8 @@ def login(
         value=token,
         max_age=AUTH_COOKIE_MAX_AGE,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         path="/",
     )
 
@@ -133,6 +134,8 @@ def logout(
     response.delete_cookie(
         key=AUTH_COOKIE_NAME,
         path="/",
+        secure=True,
+        samesite="none",
     )
 
     return {
