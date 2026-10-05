@@ -11,9 +11,7 @@ type AuthGuardProps = {
   children: ReactNode;
 };
 
-export default function AuthGuard({
-  children,
-}: AuthGuardProps) {
+export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
 
   const [administrator, setAdministrator] =
@@ -24,19 +22,19 @@ export default function AuthGuard({
     let mounted = true;
 
     const verifyAuthentication = async () => {
-      const current = await getCurrentAdministrator();
+      try {
+        const current = await getCurrentAdministrator();
 
-      if (!mounted) {
-        return;
-      }
+        if (!mounted) return;
 
-      if (!current) {
+        setAdministrator(current);
+        setChecking(false);
+      } catch {
+        if (!mounted) return;
+
+        // getCurrentAdministrator throws when not authenticated
         router.replace("/login");
-        return;
       }
-
-      setAdministrator(current);
-      setChecking(false);
     };
 
     void verifyAuthentication();
