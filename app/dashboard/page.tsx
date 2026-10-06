@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AdminShell from "@/components/layout/AdminShell";
+import { getAuthToken } from "@/lib/auth";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -50,14 +51,25 @@ export default function DashboardPage() {
         setLoading(true);
         setError(null);
 
+        const token = getAuthToken();
+
         const response = await fetch(
           `${API_URL}/api/dashboard`,
           {
             method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
             credentials: "include",
             cache: "no-store",
           }
         );
+
+        if (response.status === 401) {
+          window.location.href = "/login?redirect=/dashboard";
+          return;
+        }
 
         if (!response.ok) {
           let message =
@@ -166,8 +178,6 @@ export default function DashboardPage() {
         return "bg-[#EAF6FC] text-[#229ED9]";
 
       case "CONFIRMED":
-        return "bg-[#F1EEFF] text-[#6B5DD3]";
-
       case "ANALYZED":
         return "bg-[#F1EEFF] text-[#6B5DD3]";
 
@@ -307,10 +317,7 @@ export default function DashboardPage() {
               )}
           </div>
 
-          {/* ===================================================
-              LOADING
-          ==================================================== */}
-
+          {/* LOADING */}
           {loading && (
             <div className="mt-8 flex min-h-[180px] items-center justify-center rounded-[14px] border border-dashed border-[#DCE3EA] bg-[#FAFBFC]">
               <div className="text-center">
@@ -331,10 +338,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* ===================================================
-              EMPTY
-          ==================================================== */}
-
+          {/* EMPTY */}
           {!loading &&
             !error &&
             dashboard &&
@@ -358,10 +362,7 @@ export default function DashboardPage() {
               </div>
             )}
 
-          {/* ===================================================
-              SIGNAL LIST
-          ==================================================== */}
-
+          {/* SIGNAL LIST */}
           {!loading &&
             !error &&
             dashboard &&
@@ -375,10 +376,6 @@ export default function DashboardPage() {
                       className="rounded-[14px] border border-[#E8EDF2] bg-[#FAFBFC] p-4"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        {/* -----------------------------------
-                            SIGNAL INFO
-                        ------------------------------------ */}
-
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-[12px] font-extrabold text-[#17212B]">
@@ -400,10 +397,6 @@ export default function DashboardPage() {
                             {signal.game}
                           </p>
                         </div>
-
-                        {/* -----------------------------------
-                            CONFIGURATION
-                        ------------------------------------ */}
 
                         <div className="grid grid-cols-2 gap-x-8 gap-y-2 sm:grid-cols-4 lg:min-w-[430px]">
                           <div>
@@ -451,10 +444,6 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        {/* -----------------------------------
-                            DATE
-                        ------------------------------------ */}
-
                         <div className="lg:min-w-[155px] lg:text-right">
                           <p className="text-[9px] font-bold uppercase tracking-[0.3px] text-[#98A2B3]">
                             Generated
@@ -477,4 +466,3 @@ export default function DashboardPage() {
     </AdminShell>
   );
 }
- 
