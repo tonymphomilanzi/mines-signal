@@ -3,6 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminShell from "@/components/layout/AdminShell";
+import { getAuthToken } from "@/lib/auth";
+
+/* ============================================================
+   API CONFIG
+============================================================ */
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://127.0.0.1:8000";
 
 export default function CreateAdministratorPage() {
   const router = useRouter();
@@ -97,15 +106,22 @@ export default function CreateAdministratorPage() {
     setIsSubmitting(true);
 
     try {
+      const token = getAuthToken();
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(
-        "http://127.0.0.1:8000/api/administrators",
+        `${API_URL}/api/administrators`,
         {
           method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
+          headers,
+          credentials: "include",
           body: JSON.stringify({
             first_name: firstName.trim(),
             last_name: lastName.trim(),
@@ -123,12 +139,13 @@ export default function CreateAdministratorPage() {
       if (!response.ok) {
         throw new Error(
           data?.detail ||
+            data?.message ||
             "Failed to create administrator."
         );
       }
 
       // Administrator successfully created.
-      router.push("/adminstrators");
+      router.push("/administrators");
     } catch (error) {
       setErrorMessage(
         error instanceof Error
