@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import AdminShell from "@/components/layout/AdminShell";
+import { getAuthToken } from "@/lib/auth";
 
 /* ============================================================
    API
@@ -237,7 +238,7 @@ export default function TelegramPage() {
     useState<string | null>(null);
 
   /* ==========================================================
-     API REQUEST
+     API REQUEST (With Bearer Token)
   ========================================================== */
 
   const apiRequest = useCallback(
@@ -245,16 +246,23 @@ export default function TelegramPage() {
       path: string,
       options: RequestInit = {},
     ): Promise<T> => {
+      const token = getAuthToken();
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...((options.headers as Record<string, string>) || {}),
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(
         `${API_URL}${path}`,
         {
           ...options,
           credentials: "include",
-          headers: {
-            "Content-Type":
-              "application/json",
-            ...(options.headers || {}),
-          },
+          headers,
           cache: "no-store",
         },
       );
@@ -279,7 +287,7 @@ export default function TelegramPage() {
             message = data.message;
           }
         } catch {
-          // Keep the default HTTP error.
+          // Keep default HTTP error
         }
 
         throw new Error(message);
@@ -1528,4 +1536,4 @@ function TelegramStatusBadge({
 
     </span>
   );
-} 
+}
