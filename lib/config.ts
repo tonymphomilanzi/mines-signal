@@ -9,7 +9,7 @@ export const config = {
   // ============================================================
   // API
   // ============================================================
-  apiUrl: process.env.NEXT_PUBLIC_API_URL || "https://mines-signal-eight.vercel.app/",
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || "https://mines-signal-eight.vercel.app",
 
   // ============================================================
   // APP INFO
