@@ -28,15 +28,14 @@ export default function AuthGuard({
     );
 
   const [checking, setChecking] =
-    useState(true);
+    useState(!administrator);
 
   useEffect(() => {
     let mounted = true;
 
-    const verifyAuthentication =
-      async () => {
-        const current =
-          await getCurrentAdministrator();
+    const verifyAuthentication = async () => {
+      try {
+        const current = await getCurrentAdministrator();
 
         if (!mounted) {
           return;
@@ -49,7 +48,11 @@ export default function AuthGuard({
 
         setAdministrator(current);
         setChecking(false);
-      };
+      } catch {
+        if (!mounted) return;
+        router.replace("/login");
+      }
+    };
 
     verifyAuthentication();
 
@@ -58,12 +61,11 @@ export default function AuthGuard({
     };
   }, [router]);
 
-  if (checking || !administrator) {
+  if (checking && !administrator) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex items-center gap-3">
           <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#229ED9]/30 border-t-[#229ED9]" />
-
           <span className="text-[12px] font-semibold text-[#6B7785]">
             Checking authentication...
           </span>
