@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -9,7 +9,6 @@ const API_URL =
 
 export default function LoginPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +19,6 @@ export default function LoginPage() {
     event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    console.log("LOGIN FORM SUBMITTED");
 
     if (loading) {
       return;
@@ -34,13 +32,10 @@ export default function LoginPage() {
         `${API_URL}/api/auth/login`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           credentials: "include",
-
           body: JSON.stringify({
             email: email.trim(),
             password,
@@ -61,20 +56,23 @@ export default function LoginPage() {
           data?.detail ||
             "Unable to sign in. Please check your email and password."
         );
-
         return;
       }
 
-      /*
-       * The backend now stores the JWT in an HTTP-only
-       * cookie.
-       *
-       * We deliberately DO NOT store the token in
-       * localStorage anymore.
-       */
+      // Extract token from response
+      const token = data?.access_token || data?.token;
 
-      router.push("/dashboard");
-      router.refresh();
+      if (token) {
+        // 1. Set cookie on the Vercel domain for Next.js Middleware
+        document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax; secure`;
+        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax; secure`;
+
+        // 2. Save in localStorage for client-side API requests
+        localStorage.setItem("access_token", token);
+      }
+
+      // 3. Full navigation so Next.js Middleware picks up the new cookies
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error(
         "Login request failed:",
@@ -92,10 +90,6 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-white flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-[430px]">
-        {/* BRAND */}
-
-        
-
         <div className="rounded-[22px] border border-[#E5EAF0] bg-white p-7 shadow-[0_18px_50px_rgba(23,33,43,0.07)]">
           <div className="mb-6">
             <h2 className="text-[19px] font-extrabold text-[#17212B]">
@@ -108,7 +102,6 @@ export default function LoginPage() {
           </div>
 
           {/* ERROR */}
-
           {error && (
             <div className="mb-5 rounded-[12px] border border-[#EF4444]/20 bg-[#EF4444]/5 px-3.5 py-3">
               <p className="text-[11px] font-semibold leading-5 text-[#EF4444]">
@@ -122,7 +115,6 @@ export default function LoginPage() {
             className="space-y-5"
           >
             {/* EMAIL */}
-
             <div>
               <label
                 htmlFor="email"
@@ -170,7 +162,6 @@ export default function LoginPage() {
             </div>
 
             {/* PASSWORD */}
-
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <label
@@ -265,7 +256,7 @@ export default function LoginPage() {
                       stroke="currentColor"
                       strokeWidth="2"
                     >
-                      <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                      <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7Z" />
                       <circle
                         cx="12"
                         cy="12"
@@ -278,7 +269,6 @@ export default function LoginPage() {
             </div>
 
             {/* REMEMBER */}
-
             <div className="flex items-center justify-between">
               <label className="flex cursor-pointer items-center gap-2">
                 <input
@@ -293,7 +283,6 @@ export default function LoginPage() {
             </div>
 
             {/* SUBMIT */}
-
             <button
               type="submit"
               disabled={loading}
