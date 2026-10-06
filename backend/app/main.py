@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
+
 from sqlalchemy import text
 
 from app.api import dashboard
